@@ -26,3 +26,13 @@ def test_profile_ranges_are_valid():
     assert profile.tax_rate_min < profile.tax_rate_max
     assert profile.debt_ratio_min < profile.debt_ratio_max
     assert profile.asset_intensity_min < profile.asset_intensity_max
+
+
+def test_all_supported_industries_have_profiles():
+    from finsight.data_generation.financial_profiles import FINANCIAL_PROFILES
+    from finsight.data_generation.reference_data import generate_industries
+
+    industries = generate_industries()
+
+    for industry in industries:
+        assert industry.industry_name in FINANCIAL_PROFILES

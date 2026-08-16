@@ -15,6 +15,7 @@ class Company:
     company_name: str
     ticker: str
     industry_id: int
+    industry_name: str
     country: str
     founded_year: int
 
@@ -95,6 +96,7 @@ def generate_companies(
                 company_name=company_name,
                 ticker=ticker,
                 industry_id=industry.industry_id,
+                industry_name=industry.industry_name,
                 country=rng.choice(COUNTRIES),
                 founded_year=rng.randint(1950, 2020),
             )
