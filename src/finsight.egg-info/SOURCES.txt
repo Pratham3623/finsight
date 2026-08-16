@@ -1,0 +1,7 @@
+pyproject.toml
+src/finsight/__init__.py
+src/finsight/__main__.py
+src/finsight.egg-info/PKG-INFO
+src/finsight.egg-info/SOURCES.txt
+src/finsight.egg-info/dependency_links.txt
+src/finsight.egg-info/top_level.txt
