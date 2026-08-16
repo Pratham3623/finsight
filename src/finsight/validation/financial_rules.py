@@ -9,6 +9,24 @@ class RowValidationResult:
     rejection_reasons: pd.Series
 
 
+REQUIRED_COLUMNS = [
+    "financial_id",
+    "company_id",
+    "fiscal_year",
+    "fiscal_quarter",
+    "period_end_date",
+    "revenue",
+    "operating_expenses",
+    "net_income",
+    "total_assets",
+    "total_liabilities",
+    "total_debt",
+    "operating_cash_flow",
+    "investing_cash_flow",
+    "financing_cash_flow",
+]
+
+
 def validate_financial_rules(
     dataframe: pd.DataFrame,
 ) -> RowValidationResult:
@@ -24,9 +42,17 @@ def validate_financial_rules(
         nonlocal reasons
 
         applicable = mask & reasons.eq("")
-
         reasons.loc[applicable] = reason
 
+    # Required fields
+    missing_required = dataframe[REQUIRED_COLUMNS].isna().any(axis=1)
+
+    add_reason(
+        missing_required,
+        "missing_required_value",
+    )
+
+    # IDs
     add_reason(
         dataframe["financial_id"].isna()
         | (dataframe["financial_id"] <= 0),
@@ -39,6 +65,7 @@ def validate_financial_rules(
         "invalid_company_id",
     )
 
+    # Time dimensions
     add_reason(
         dataframe["fiscal_year"].isna()
         | (dataframe["fiscal_year"] < 2000),
@@ -51,15 +78,17 @@ def validate_financial_rules(
         "invalid_fiscal_quarter",
     )
 
+    parsed_dates = pd.to_datetime(
+        dataframe["period_end_date"],
+        errors="coerce",
+    )
+
     add_reason(
-        dataframe["period_end_date"].isna()
-        | pd.to_datetime(
-            dataframe["period_end_date"],
-            errors="coerce",
-        ).isna(),
+        parsed_dates.isna(),
         "invalid_period_end_date",
     )
 
+    # Financial values
     non_negative_columns = [
         "revenue",
         "operating_expenses",
@@ -75,6 +104,7 @@ def validate_financial_rules(
             f"invalid_{column}",
         )
 
+    # Financial relationships
     add_reason(
         dataframe["total_debt"] > dataframe["total_liabilities"],
         "debt_exceeds_liabilities",
@@ -90,6 +120,7 @@ def validate_financial_rules(
         "net_income_exceeds_revenue",
     )
 
+    # Duplicate financial IDs
     duplicate_financial_id = dataframe["financial_id"].duplicated(
         keep=False
     )
@@ -99,6 +130,7 @@ def validate_financial_rules(
         "duplicate_financial_id",
     )
 
+    # Duplicate business grain
     duplicate_grain = dataframe.duplicated(
         subset=[
             "company_id",
