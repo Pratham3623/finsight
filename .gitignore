@@ -42,3 +42,8 @@ logs/
 *.egg-info/
 dist/
 build/
+
+# Generated datasets
+data/raw/
+data/processed/
+data/rejected/
