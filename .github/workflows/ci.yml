@@ -67,6 +67,14 @@ jobs:
         run: |
           python scripts/generate_financial_data.py
 
+      - name: Create dirty financial data
+        run: |
+          python scripts/create_dirty_financial_data.py
+
+      - name: Run local ETL
+        run: |
+          python -m finsight.pipeline
+
       - name: Run local ETL
         run: |
           python -m finsight.pipeline
