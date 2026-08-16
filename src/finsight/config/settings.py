@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 
@@ -23,15 +24,23 @@ def get_database_settings() -> DatabaseSettings:
         "POSTGRES_PORT": os.getenv("POSTGRES_PORT"),
     }
 
-    missing = [key for key, value in required.items() if not value]
+    missing = [
+        key
+        for key, value in required.items()
+        if not value
+    ]
 
     if missing:
         raise RuntimeError(
-            f"Missing required environment variables: {', '.join(missing)}"
+            "Missing required environment variables: "
+            + ", ".join(missing)
         )
 
     return DatabaseSettings(
-        host="localhost",
+        host=os.getenv(
+            "POSTGRES_HOST",
+            "localhost",
+        ),
         port=int(required["POSTGRES_PORT"]),
         database=required["POSTGRES_DB"],
         user=required["POSTGRES_USER"],
