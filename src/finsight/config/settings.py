@@ -18,6 +18,7 @@ class DatabaseSettings:
 
 def get_database_settings() -> DatabaseSettings:
     required = {
+        "POSTGRES_HOST": os.getenv("POSTGRES_HOST", "localhost"),
         "POSTGRES_DB": os.getenv("POSTGRES_DB"),
         "POSTGRES_USER": os.getenv("POSTGRES_USER"),
         "POSTGRES_PASSWORD": os.getenv("POSTGRES_PASSWORD"),
@@ -37,10 +38,7 @@ def get_database_settings() -> DatabaseSettings:
         )
 
     return DatabaseSettings(
-        host=os.getenv(
-            "POSTGRES_HOST",
-            "localhost",
-        ),
+        host=required["POSTGRES_HOST"],
         port=int(required["POSTGRES_PORT"]),
         database=required["POSTGRES_DB"],
         user=required["POSTGRES_USER"],
