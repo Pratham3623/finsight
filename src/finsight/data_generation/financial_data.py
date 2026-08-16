@@ -1,8 +1,10 @@
+import random
 from dataclasses import dataclass
 from datetime import date
-import random
 
-from finsight.data_generation.financial_profiles import get_financial_profile
+from finsight.data_generation.financial_profiles import (
+    get_financial_profile,
+)
 from finsight.data_generation.reference_data import Company
 
 
@@ -38,6 +40,7 @@ def generate_financials(
     seed: int = 42,
 ) -> list[FinancialRecord]:
     """Generate deterministic quarterly financial records."""
+
     if not companies:
         raise ValueError("At least one company is required.")
 
@@ -52,57 +55,41 @@ def generate_financials(
     for company in companies:
         profile = get_financial_profile(company.industry_name)
 
-
         annual_growth = rng.uniform(
             profile.annual_growth_min,
             profile.annual_growth_max,
         )
 
-        base_annual_revenue = rng.uniform(
+        revenue = rng.uniform(
             profile.revenue_min,
             profile.revenue_max,
-        )
-
-        asset_intensity = rng.uniform(
-            profile.asset_intensity_min,
-            profile.asset_intensity_max,
-        )
-
-        debt_ratio = rng.uniform(
-            profile.debt_ratio_min,
-            profile.debt_ratio_max,
         )
 
         for period_index in range(periods):
             year = start_year + period_index // 4
             quarter = (period_index % 4) + 1
 
-            years_elapsed = period_index / 4
-
-            growth_factor = (1 + annual_growth) ** years_elapsed
-
             seasonal_factor = _seasonal_factor(quarter)
 
-            revenue = (
-                base_annual_revenue
-                * growth_factor
-                * seasonal_factor
-            )
+            if period_index > 0:
+                revenue *= 1 + annual_growth / 4
 
-            revenue *= rng.uniform(0.97, 1.03)
+            revenue *= seasonal_factor
 
-            expense_ratio = rng.uniform(
+            revenue = max(revenue, 1.0)
+
+            operating_expense_ratio = rng.uniform(
                 profile.operating_expense_ratio_min,
                 profile.operating_expense_ratio_max,
             )
 
-            operating_expenses = revenue * expense_ratio
+            operating_expenses = (
+                revenue * operating_expense_ratio
+            )
 
-            operating_profit = revenue - operating_expenses
-
-            interest_expense = revenue * rng.uniform(0.01, 0.04)
-
-            pre_tax_income = operating_profit - interest_expense
+            pre_tax_income = (
+                revenue - operating_expenses
+            )
 
             tax_rate = rng.uniform(
                 profile.tax_rate_min,
@@ -113,18 +100,49 @@ def generate_financials(
 
             net_income = pre_tax_income - taxes
 
-            total_assets = revenue * asset_intensity
-
-            total_debt = total_assets * debt_ratio
-
-            total_liabilities = total_debt + (
-                total_assets * rng.uniform(0.10, 0.30)
+            # Financial position relationships:
+            #
+            # total_debt <= total_liabilities <= total_assets
+            #
+            # Assets are derived from revenue and industry-specific
+            # asset intensity.
+            asset_intensity = rng.uniform(
+                profile.asset_intensity_min,
+                profile.asset_intensity_max,
             )
 
-            operating_cash_flow = net_income * rng.uniform(0.85, 1.20)
+            total_assets = revenue * asset_intensity
+
+            debt_ratio = rng.uniform(
+                profile.debt_ratio_min,
+                profile.debt_ratio_max,
+            )
+
+            liability_ratio = rng.uniform(
+                max(debt_ratio, 0.30),
+                min(
+                    0.90,
+                    max(debt_ratio, 0.30) + 0.25,
+                ),
+            )
+
+            total_liabilities = (
+                total_assets * liability_ratio
+            )
+
+            total_debt = (
+                total_liabilities
+                * rng.uniform(0.50, 0.85)
+            )
+
+            operating_cash_flow = (
+                net_income
+                * rng.uniform(0.85, 1.20)
+            )
 
             investing_cash_flow = -(
-                total_assets * rng.uniform(0.01, 0.05)
+                total_assets
+                * rng.uniform(0.01, 0.05)
             )
 
             financing_cash_flow = rng.uniform(
@@ -138,16 +156,40 @@ def generate_financials(
                     company_id=company.company_id,
                     fiscal_year=year,
                     fiscal_quarter=quarter,
-                    period_end_date=_quarter_end_date(year, quarter),
+                    period_end_date=_quarter_end_date(
+                        year,
+                        quarter,
+                    ),
                     revenue=round(revenue, 2),
-                    operating_expenses=round(operating_expenses, 2),
+                    operating_expenses=round(
+                        operating_expenses,
+                        2,
+                    ),
                     net_income=round(net_income, 2),
-                    total_assets=round(total_assets, 2),
-                    total_liabilities=round(total_liabilities, 2),
-                    total_debt=round(total_debt, 2),
-                    operating_cash_flow=round(operating_cash_flow, 2),
-                    investing_cash_flow=round(investing_cash_flow, 2),
-                    financing_cash_flow=round(financing_cash_flow, 2),
+                    total_assets=round(
+                        total_assets,
+                        2,
+                    ),
+                    total_liabilities=round(
+                        total_liabilities,
+                        2,
+                    ),
+                    total_debt=round(
+                        total_debt,
+                        2,
+                    ),
+                    operating_cash_flow=round(
+                        operating_cash_flow,
+                        2,
+                    ),
+                    investing_cash_flow=round(
+                        investing_cash_flow,
+                        2,
+                    ),
+                    financing_cash_flow=round(
+                        financing_cash_flow,
+                        2,
+                    ),
                 )
             )
 
