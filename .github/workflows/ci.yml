@@ -13,6 +13,27 @@ jobs:
     name: Test and Build
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: finsight
+          POSTGRES_USER: finsight
+          POSTGRES_PASSWORD: finsight_ci_password
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U finsight -d finsight"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      POSTGRES_DB: finsight
+      POSTGRES_USER: finsight
+      POSTGRES_PASSWORD: finsight_ci_password
+      POSTGRES_PORT: 5433
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -23,7 +44,7 @@ jobs:
           python-version: "3.11"
 
       - name: Install Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -32,7 +53,46 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
-          pip install httpx2
+
+      - name: Initialize database schema
+        run: |
+          PGPASSWORD="$POSTGRES_PASSWORD" \
+          psql \
+            -h localhost \
+            -p "$POSTGRES_PORT" \
+            -U "$POSTGRES_USER" \
+            -d "$POSTGRES_DB" \
+            -f src/finsight/database/schema.sql
+
+      - name: Load PostgreSQL data
+        run: |
+          python scripts/load_postgres.py
+
+      - name: Create analytics views
+        run: |
+          PGPASSWORD="$POSTGRES_PASSWORD" \
+          psql \
+            -h localhost \
+            -p "$POSTGRES_PORT" \
+            -U "$POSTGRES_USER" \
+            -d "$POSTGRES_DB" \
+            -f src/finsight/analytics/sql/financial_metrics.sql
+
+          PGPASSWORD="$POSTGRES_PASSWORD" \
+          psql \
+            -h localhost \
+            -p "$POSTGRES_PORT" \
+            -U "$POSTGRES_USER" \
+            -d "$POSTGRES_DB" \
+            -f src/finsight/analytics/sql/industry_benchmarks.sql
+
+          PGPASSWORD="$POSTGRES_PASSWORD" \
+          psql \
+            -h localhost \
+            -p "$POSTGRES_PORT" \
+            -U "$POSTGRES_USER" \
+            -d "$POSTGRES_DB" \
+            -f src/finsight/analytics/sql/company_rankings.sql
 
       - name: Run tests
         run: |
