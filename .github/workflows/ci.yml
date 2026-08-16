@@ -49,10 +49,27 @@ jobs:
           distribution: temurin
           java-version: "17"
 
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev]"
+
+      - name: Generate reference data
+        run: |
+          python scripts/generate_reference_data.py
+
+      - name: Generate financial data
+        run: |
+          python scripts/generate_financial_data.py
+
+      - name: Run local ETL
+        run: |
+          python -m finsight.pipeline
 
       - name: Initialize database schema
         run: |
