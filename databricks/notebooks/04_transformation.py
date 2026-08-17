@@ -5,12 +5,55 @@ print("FinSight — Databricks Transformation")
 print("=" * 50)
 
 SILVER_PATH = "/Volumes/workspace/default/finsight_data/silver/financials"
+COMPANIES_PATH = "/Volumes/workspace/default/finsight_data/companies.csv"
 GOLD_PATH = "/Volumes/workspace/default/finsight_data/gold/financial_metrics"
 
-df = spark.read.format("delta").load(SILVER_PATH)
+# ---------------------------------------------------------
+# 1. Read Silver financial data
+# ---------------------------------------------------------
+
+df = (
+    spark.read
+    .format("delta")
+    .load(SILVER_PATH)
+)
+
+print(f"Silver records: {df.count():,}")
 
 # ---------------------------------------------------------
-# Financial metrics
+# 2. Read company reference data
+# ---------------------------------------------------------
+
+companies = (
+    spark.read
+    .option("header", True)
+    .option("inferSchema", True)
+    .csv(COMPANIES_PATH)
+    .select(
+        "company_id",
+        "company_name",
+        "ticker",
+        "industry_id",
+        "industry_name",
+    )
+)
+
+print(f"Company reference records: {companies.count():,}")
+
+# ---------------------------------------------------------
+# 3. Join financial data with company reference data
+# ---------------------------------------------------------
+
+df = (
+    df.join(
+        companies,
+        on="company_id",
+        how="left",
+    )
+)
+
+# ---------------------------------------------------------
+# 4. Financial metrics
 # ---------------------------------------------------------
 
 df = (
@@ -27,7 +70,10 @@ df = (
     .withColumn(
         "operating_margin_pct",
         F.round(
-            (F.col("revenue") - F.col("operating_expenses"))
+            (
+                F.col("revenue")
+                - F.col("operating_expenses")
+            )
             / F.nullif(F.col("revenue"), F.lit(0))
             * 100,
             2,
@@ -47,7 +93,8 @@ df = (
         F.round(
             F.col("total_debt")
             / F.nullif(
-                F.col("total_assets") - F.col("total_liabilities"),
+                F.col("total_assets")
+                - F.col("total_liabilities"),
                 F.lit(0),
             )
             * 100,
@@ -75,10 +122,14 @@ df = (
 )
 
 # ---------------------------------------------------------
-# YoY revenue growth
+# 5. YoY revenue growth
 # ---------------------------------------------------------
 
-window = Window.partitionBy("company_id").orderBy("period_end_date")
+window = (
+    Window
+    .partitionBy("company_id")
+    .orderBy("period_end_date")
+)
 
 df = (
     df
@@ -91,14 +142,49 @@ df = (
         F.round(
             (
                 F.col("revenue")
-                / F.nullif(F.col("previous_year_revenue"), F.lit(0))
+                / F.nullif(
+                    F.col("previous_year_revenue"),
+                    F.lit(0),
+                )
                 - 1
-            ) * 100,
+            )
+            * 100,
             2,
         ),
     )
     .drop("previous_year_revenue")
 )
+
+# ---------------------------------------------------------
+# 6. Verify enrichment
+# ---------------------------------------------------------
+
+missing_company_metadata = (
+    df
+    .filter(
+        F.col("company_name").isNull()
+        | F.col("ticker").isNull()
+        | F.col("industry_id").isNull()
+        | F.col("industry_name").isNull()
+    )
+    .count()
+)
+
+print(
+    f"Records missing company metadata: "
+    f"{missing_company_metadata:,}"
+)
+
+if missing_company_metadata > 0:
+    raise ValueError(
+        "Gold transformation failed: "
+        f"{missing_company_metadata:,} records are missing "
+        "company reference data."
+    )
+
+# ---------------------------------------------------------
+# 7. Write Gold Delta layer
+# ---------------------------------------------------------
 
 (
     df.write
@@ -108,12 +194,31 @@ df = (
     .save(GOLD_PATH)
 )
 
-print(f"Gold records: {df.count():,}")
+gold_count = df.count()
+
+print(f"Gold records: {gold_count:,}")
 print(f"Gold path: {GOLD_PATH}")
+
+# ---------------------------------------------------------
+# 8. Verify Gold schema
+# ---------------------------------------------------------
+
+print("\nGold schema:")
+df.printSchema()
+
+# ---------------------------------------------------------
+# 9. Sample enriched records
+# ---------------------------------------------------------
+
+print("\nSample enriched records:")
 
 display(
     df.select(
         "company_id",
+        "company_name",
+        "ticker",
+        "industry_id",
+        "industry_name",
         "fiscal_year",
         "fiscal_quarter",
         "revenue",
@@ -121,8 +226,10 @@ display(
         "operating_margin_pct",
         "debt_to_assets_pct",
         "roa_pct",
+        "operating_cash_flow_margin_pct",
         "revenue_growth_yoy_pct",
-    ).limit(10)
+    )
+    .limit(10)
 )
 
 print("\nTransformation completed successfully.")
