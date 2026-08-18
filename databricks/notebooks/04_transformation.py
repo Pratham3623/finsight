@@ -190,6 +190,7 @@ if missing_company_metadata > 0:
     df.write
     .format("delta")
     .mode("overwrite")
+    .option("overwriteSchema", "true")
     .partitionBy("fiscal_year")
     .save(GOLD_PATH)
 )
