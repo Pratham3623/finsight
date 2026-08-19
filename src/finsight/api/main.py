@@ -1,20 +1,29 @@
 from datetime import date
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
+from finsight.ai.analyst import FinSightAnalyst
 from finsight.analytics.models import (
     CompanyMetric,
     CompanyRanking,
     IndustryBenchmark,
 )
 from finsight.analytics.service import (
+    get_ai_company_context,
+    get_ai_comparison_context,
+    get_ai_portfolio_context,
     get_company_metrics,
     get_company_rankings,
     get_company_summary,
     get_industry_benchmarks,
 )
 from finsight.database.connection import get_connection
+
+
+# ============================================================
+# RESPONSE MODELS
+# ============================================================
 
 
 class HealthResponse(BaseModel):
@@ -85,6 +94,66 @@ class CompanySummaryResponse(BaseModel):
     periods_available: int
 
 
+# ============================================================
+# AI REQUEST / RESPONSE MODELS
+# ============================================================
+
+
+class AIAnalysisRequest(BaseModel):
+    question: str = Field(
+        min_length=1,
+        max_length=4000,
+    )
+    company_id: int = Field(
+        ge=1,
+    )
+
+
+class AIAnalysisResponse(BaseModel):
+    company_id: int
+    question: str
+    answer: str
+
+
+class AIPortfolioAnalysisRequest(BaseModel):
+    question: str = Field(
+        min_length=1,
+        max_length=4000,
+    )
+    limit: int = Field(
+        default=20,
+        ge=1,
+        le=100,
+    )
+
+
+class AIPortfolioAnalysisResponse(BaseModel):
+    question: str
+    answer: str
+
+
+class AIComparisonRequest(BaseModel):
+    question: str = Field(
+        min_length=1,
+        max_length=4000,
+    )
+    company_ids: list[int] = Field(
+        min_length=2,
+        max_length=10,
+    )
+
+
+class AIComparisonResponse(BaseModel):
+    company_ids: list[int]
+    question: str
+    answer: str
+
+
+# ============================================================
+# APPLICATION
+# ============================================================
+
+
 app = FastAPI(
     title="FinSight API",
     description="Financial analytics API",
@@ -92,12 +161,19 @@ app = FastAPI(
 )
 
 
+# ============================================================
+# HEALTH
+# ============================================================
+
+
 @app.get(
     "/health",
     response_model=HealthResponse,
 )
 def health() -> HealthResponse:
-    return HealthResponse(status="healthy")
+    return HealthResponse(
+        status="healthy",
+    )
 
 
 @app.get(
@@ -110,19 +186,30 @@ def readiness() -> HealthResponse:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
                 cursor.fetchone()
+
     except Exception as exc:
         raise HTTPException(
             status_code=503,
             detail="Database is not ready.",
         ) from exc
 
-    return HealthResponse(status="ready")
+    return HealthResponse(
+        status="ready",
+    )
 
 
-@app.get("/api/companies/rankings")
+# ============================================================
+# COMPANY RANKINGS
+# ============================================================
+
+
+@app.get(
+    "/api/companies/rankings",
+)
 def company_rankings(
     limit: int = 20,
 ) -> list[CompanyRanking]:
+
     if limit <= 0:
         raise HTTPException(
             status_code=400,
@@ -136,12 +223,20 @@ def company_rankings(
         )
 
     try:
-        return get_company_rankings(limit)
+        return get_company_rankings(
+            limit,
+        )
+
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
             detail=str(exc),
         ) from exc
+
+
+# ============================================================
+# INDUSTRY BENCHMARKS
+# ============================================================
 
 
 @app.get(
@@ -152,6 +247,11 @@ def industry_benchmarks() -> list[IndustryBenchmark]:
     return get_industry_benchmarks()
 
 
+# ============================================================
+# COMPANY METRICS
+# ============================================================
+
+
 @app.get(
     "/api/companies/{company_id}/metrics",
     response_model=list[CompanyMetricResponse],
@@ -159,15 +259,32 @@ def industry_benchmarks() -> list[IndustryBenchmark]:
 def company_metrics(
     company_id: int,
 ) -> list[CompanyMetric]:
-    metrics = get_company_metrics(company_id)
+
+    if company_id <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Company ID must be greater than zero.",
+        )
+
+    metrics = get_company_metrics(
+        company_id,
+    )
 
     if not metrics:
         raise HTTPException(
             status_code=404,
-            detail=f"Company {company_id} was not found.",
+            detail=(
+                f"Company {company_id} "
+                "was not found."
+            ),
         )
 
     return metrics
+
+
+# ============================================================
+# COMPANY SUMMARY
+# ============================================================
 
 
 @app.get(
@@ -177,32 +294,230 @@ def company_metrics(
 def company_summary(
     company_id: int,
 ) -> CompanySummaryResponse:
+
+    if company_id <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Company ID must be greater than zero.",
+        )
+
     try:
-        summary = get_company_summary(company_id)
+        summary = get_company_summary(
+            company_id,
+        )
 
         return CompanySummaryResponse(
-            company_id=int(summary["company_id"]),
-            company_name=str(summary["company_name"]),
-            ticker=str(summary["ticker"]),
-            industry=str(summary["industry"]),
-            latest_period=summary["latest_period"],
-            latest_revenue=float(summary["latest_revenue"]),
-            latest_net_income=float(summary["latest_net_income"]),
+            company_id=int(
+                summary["company_id"]
+            ),
+            company_name=str(
+                summary["company_name"]
+            ),
+            ticker=str(
+                summary["ticker"]
+            ),
+            industry=str(
+                summary["industry"]
+            ),
+            latest_period=summary[
+                "latest_period"
+            ],
+            latest_revenue=float(
+                summary["latest_revenue"]
+            ),
+            latest_net_income=float(
+                summary["latest_net_income"]
+            ),
             latest_net_profit_margin_pct=float(
-                summary["latest_net_profit_margin_pct"]
+                summary[
+                    "latest_net_profit_margin_pct"
+                ]
             ),
             latest_roa_pct=float(
                 summary["latest_roa_pct"]
             ),
             latest_debt_to_assets_pct=float(
-                summary["latest_debt_to_assets_pct"]
+                summary[
+                    "latest_debt_to_assets_pct"
+                ]
             ),
             periods_available=int(
                 summary["periods_available"]
             ),
         )
+
     except ValueError as exc:
         raise HTTPException(
             status_code=404,
+            detail=str(exc),
+        ) from exc
+
+
+# ============================================================
+# AI — SINGLE COMPANY
+# ============================================================
+
+
+@app.post(
+    "/api/ai/analyze",
+    response_model=AIAnalysisResponse,
+)
+def ai_analyze(
+    request: AIAnalysisRequest,
+) -> AIAnalysisResponse:
+
+    question = request.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=400,
+            detail="Question must not be empty.",
+        )
+
+    try:
+        context = get_ai_company_context(
+            request.company_id,
+        )
+
+        analyst = FinSightAnalyst()
+
+        answer = analyst.analyze(
+            question=question,
+            financial_context=context,
+        )
+
+        return AIAnalysisResponse(
+            company_id=request.company_id,
+            question=question,
+            answer=answer,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=404,
+            detail=str(exc),
+        ) from exc
+
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=str(exc),
+        ) from exc
+
+
+# ============================================================
+# AI — PORTFOLIO
+# ============================================================
+
+
+@app.post(
+    "/api/ai/portfolio",
+    response_model=AIPortfolioAnalysisResponse,
+)
+def ai_portfolio_analyze(
+    request: AIPortfolioAnalysisRequest,
+) -> AIPortfolioAnalysisResponse:
+
+    question = request.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=400,
+            detail="Question must not be empty.",
+        )
+
+    try:
+        context = get_ai_portfolio_context(
+            request.limit,
+        )
+
+        analyst = FinSightAnalyst()
+
+        answer = analyst.analyze(
+            question=question,
+            financial_context=context,
+        )
+
+        return AIPortfolioAnalysisResponse(
+            question=question,
+            answer=answer,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=502,
+            detail=str(exc),
+        ) from exc
+
+
+# ============================================================
+# AI — COMPANY COMPARISON
+# ============================================================
+
+
+@app.post(
+    "/api/ai/compare",
+    response_model=AIComparisonResponse,
+)
+def ai_compare(
+    request: AIComparisonRequest,
+) -> AIComparisonResponse:
+
+    question = request.question.strip()
+
+    if not question:
+        raise HTTPException(
+            status_code=400,
+            detail="Question must not be empty.",
+        )
+
+    unique_ids = list(
+        dict.fromkeys(
+            request.company_ids
+        )
+    )
+
+    if len(unique_ids) < 2:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                "At least two unique "
+                "company IDs are required."
+            ),
+        )
+
+    try:
+        context = get_ai_comparison_context(
+            unique_ids,
+        )
+
+        analyst = FinSightAnalyst()
+
+        answer = analyst.analyze(
+            question=question,
+            financial_context=context,
+        )
+
+        return AIComparisonResponse(
+            company_ids=unique_ids,
+            question=question,
+            answer=answer,
+        )
+
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=str(exc),
+        ) from exc
+
+    except RuntimeError as exc:
+        raise HTTPException(
+            status_code=502,
             detail=str(exc),
         ) from exc

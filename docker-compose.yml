@@ -40,6 +40,11 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      OLLAMA_MODEL: ${OLLAMA_MODEL}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
     ports:
       - "8000:8000"
