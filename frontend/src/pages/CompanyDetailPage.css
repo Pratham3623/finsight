@@ -1,0 +1,637 @@
+.company-detail-page {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 28px 34px 48px;
+  box-sizing: border-box;
+  color: #e8eaed;
+}
+
+.company-detail-top {
+  margin-bottom: 20px;
+}
+
+.company-back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #727b88;
+  font-size: 11px;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    color 120ms ease,
+    transform 120ms ease;
+}
+
+.company-back-link:hover {
+  color: #d7dce2;
+}
+
+.company-hero {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.company-identity {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.company-logo {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #303640;
+  border-radius: 8px;
+  background: #15181d;
+  color: #8da6ff;
+}
+
+.company-identity-copy {
+  min-width: 0;
+}
+
+.company-meta {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 5px;
+  color: #6e7784;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.company-meta-dot {
+  color: #454c56;
+}
+
+.company-identity-copy h1 {
+  margin: 0;
+  color: #f0f2f4;
+  font-size: clamp(22px, 2vw, 29px);
+  font-weight: 550;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.company-identity-copy p {
+  margin: 7px 0 0;
+  color: #737c88;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.company-reference {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+  padding-top: 4px;
+}
+
+.company-reference span {
+  color: #555d68;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 7px;
+  letter-spacing: 0.08em;
+}
+
+.company-reference strong {
+  color: #8993a0;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* KPI SECTION */
+
+.company-kpi-grid {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  border: 1px solid #292f37;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111419;
+  margin-bottom: 14px;
+}
+
+.company-kpi-card {
+  min-width: 0;
+  min-height: 126px;
+  padding: 20px 22px;
+  border-right: 1px solid #292f37;
+  box-sizing: border-box;
+}
+
+.company-kpi-card:last-child {
+  border-right: 0;
+}
+
+.company-kpi-label {
+  display: block;
+  margin-bottom: 11px;
+  color: #68717d;
+  font-size: 9px;
+  line-height: 1.2;
+}
+
+.company-kpi-value {
+  display: block;
+  color: #eef0f3;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: clamp(21px, 2vw, 27px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.company-kpi-detail {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 14px;
+  margin-top: 9px;
+  color: #59626e;
+  font-size: 8px;
+  line-height: 1.3;
+}
+
+.kpi-positive-icon {
+  display: inline-flex;
+  color: #56ba91;
+}
+
+.kpi-negative-icon {
+  display: inline-flex;
+  color: #d97878;
+}
+
+.kpi-positive-text {
+  color: #56ba91;
+}
+
+.kpi-negative-text {
+  color: #d97878;
+}
+
+/* MAIN ANALYSIS */
+
+.company-analysis-grid {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.65fr)
+    minmax(280px, 0.72fr);
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.company-card {
+  min-width: 0;
+  border: 1px solid #292f37;
+  border-radius: 8px;
+  background: #111419;
+  box-sizing: border-box;
+}
+
+.company-chart-card,
+.company-health-card {
+  min-height: 410px;
+}
+
+.company-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 19px 20px 0;
+}
+
+.company-card-header h2 {
+  margin: 0;
+  color: #e7e9ec;
+  font-size: 13px;
+  font-weight: 550;
+  line-height: 1.3;
+}
+
+.company-card-header p {
+  margin: 5px 0 0;
+  color: #626b77;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.company-card-meta {
+  flex: 0 0 auto;
+  padding-top: 2px;
+  color: #59626d;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.company-chart {
+  height: 310px;
+  padding: 10px 16px 0 8px;
+  box-sizing: border-box;
+}
+
+.company-empty {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #606975;
+  font-size: 10px;
+}
+
+.company-chart-legend {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 20px 18px;
+  color: #69727e;
+  font-size: 8px;
+}
+
+.company-chart-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-revenue,
+.legend-income {
+  display: inline-block;
+  width: 17px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.legend-revenue {
+  background: #7896ee;
+}
+
+.legend-income {
+  background: #58b990;
+}
+
+/* HEALTH */
+
+.company-health-card {
+  padding-bottom: 18px;
+}
+
+.company-health-card .company-card-header {
+  padding-bottom: 12px;
+}
+
+.health-metric {
+  margin: 0 20px;
+  padding: 16px 0;
+  border-bottom: 1px solid #22272e;
+}
+
+.health-metric-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 9px;
+}
+
+.health-metric-heading span {
+  color: #707986;
+  font-size: 9px;
+}
+
+.health-metric-heading strong {
+  color: #e1e4e8;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.health-meter {
+  width: 100%;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #242a31;
+}
+
+.health-meter div {
+  height: 100%;
+  border-radius: inherit;
+  background: #58b990;
+  transition: width 300ms ease;
+}
+
+.company-period-count {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin: 16px 20px 0;
+  padding-top: 2px;
+}
+
+.company-period-count span {
+  color: #68717c;
+  font-size: 9px;
+}
+
+.company-period-count strong {
+  color: #dce0e5;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* HISTORY TABLE */
+
+.company-history-card {
+  overflow: hidden;
+}
+
+.company-table-scroll {
+  width: 100%;
+  margin-top: 18px;
+  overflow-x: auto;
+  border-top: 1px solid #292f37;
+}
+
+.company-financial-table {
+  width: 100%;
+  min-width: 920px;
+  border-collapse: collapse;
+  table-layout: auto;
+}
+
+.company-financial-table th {
+  height: 38px;
+  padding: 0 14px;
+  border-bottom: 1px solid #252a31;
+  color: #646d79;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 7px;
+  font-weight: 500;
+  letter-spacing: 0.045em;
+  text-align: right;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.company-financial-table th:first-child {
+  padding-left: 20px;
+  text-align: left;
+}
+
+.company-financial-table th:last-child {
+  padding-right: 20px;
+}
+
+.company-financial-table td {
+  height: 52px;
+  padding: 0 14px;
+  border-bottom: 1px solid #20252c;
+  color: #b8bec7;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 8px;
+  font-weight: 400;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.company-financial-table td:first-child {
+  padding-left: 20px;
+  text-align: left;
+}
+
+.company-financial-table td:last-child {
+  padding-right: 20px;
+}
+
+.company-financial-table tbody tr {
+  transition:
+    background 100ms ease;
+}
+
+.company-financial-table tbody tr:hover {
+  background: #15191e;
+}
+
+.company-financial-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.period-cell strong {
+  display: block;
+  color: #dce0e5;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.period-cell span {
+  display: block;
+  margin-top: 4px;
+  color: #565f6b;
+  font-size: 7px;
+  line-height: 1.2;
+}
+
+.positive-value {
+  color: #58b990 !important;
+}
+
+/* LOADING / ERROR */
+
+.company-detail-loading {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #626b77;
+  font-size: 10px;
+}
+
+.company-loading-bar {
+  width: 130px;
+  height: 2px;
+  overflow: hidden;
+  position: relative;
+  background: #252b32;
+}
+
+.company-loading-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 45%;
+  background: #7896ee;
+  animation: company-loading 1.1s
+    ease-in-out infinite;
+}
+
+@keyframes company-loading {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(320%);
+  }
+}
+
+.company-detail-error {
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+}
+
+.company-detail-error strong {
+  color: #e3e6e9;
+  font-size: 14px;
+  font-weight: 550;
+}
+
+.company-detail-error span {
+  max-width: 420px;
+  color: #6c7581;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.company-detail-error .company-back-link {
+  margin-top: 8px;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1100px) {
+  .company-detail-page {
+    padding: 24px 24px 40px;
+  }
+
+  .company-analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .company-health-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 760px) {
+  .company-detail-page {
+    padding: 20px 16px 32px;
+  }
+
+  .company-hero {
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .company-reference {
+    align-items: flex-start;
+  }
+
+  .company-kpi-grid {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+
+  .company-kpi-card:nth-child(2) {
+    border-right: 0;
+  }
+
+  .company-kpi-card:nth-child(-n + 2) {
+    border-bottom: 1px solid #292f37;
+  }
+
+  .company-kpi-card {
+    min-height: 112px;
+  }
+}
+
+@media (max-width: 480px) {
+  .company-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .company-kpi-card {
+    border-right: 0;
+    border-bottom: 1px solid #292f37;
+  }
+
+  .company-kpi-card:last-child {
+    border-bottom: 0;
+  }
+
+  .company-identity {
+    align-items: flex-start;
+  }
+
+  .company-logo {
+    width: 38px;
+    height: 38px;
+  }
+}

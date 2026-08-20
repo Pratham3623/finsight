@@ -69,10 +69,18 @@ def get_industry_benchmarks() -> list[IndustryBenchmark]:
 def get_company_rankings(
     limit: int = 20,
 ) -> list[CompanyRanking]:
-    if limit <= 0:
-        raise ValueError("Limit must be greater than zero.")
 
-    sql = """
+    if limit <= 0:
+        raise ValueError(
+            "Limit must be greater than zero."
+        )
+
+    if limit > 100:
+        raise ValueError(
+            "Limit must not exceed 100."
+        )
+
+    query = """
         SELECT
             company_id,
             company_name,
@@ -83,18 +91,26 @@ def get_company_rankings(
             avg_roa_pct,
             avg_revenue_growth_yoy_pct,
             roa_rank,
-            revenue_rank
+            revenue_rank,
+            overall_score,
+            overall_rank
         FROM company_rankings
-        ORDER BY roa_rank
+        ORDER BY overall_rank
         LIMIT %s;
     """
 
     with get_connection() as connection:
         with connection.cursor() as cursor:
-            cursor.execute(sql, (limit,))
+            cursor.execute(
+                query,
+                (limit,),
+            )
             rows = cursor.fetchall()
 
-    return [CompanyRanking(*row) for row in rows]
+    return [
+        CompanyRanking(*row)
+        for row in rows
+    ]
 
 
 def get_company_summary(

@@ -47,3 +47,6 @@ class CompanyRanking:
     avg_revenue_growth_yoy_pct: float
     roa_rank: int
     revenue_rank: int
+    overall_score: float
+    overall_rank: int
+

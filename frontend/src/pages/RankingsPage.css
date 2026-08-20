@@ -1,0 +1,395 @@
+.rankings-page {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 30px 34px 48px;
+  box-sizing: border-box;
+  color: #e8eaed;
+}
+
+.rankings-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.rankings-eyebrow {
+  margin: 0 0 7px;
+  color: #7896ee;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.rankings-heading h1 {
+  margin: 0;
+  color: #f0f2f4;
+  font-size: 27px;
+  font-weight: 550;
+  letter-spacing: -0.035em;
+}
+
+.rankings-heading p {
+  margin: 7px 0 0;
+  color: #6d7682;
+  font-size: 10px;
+}
+
+.rankings-heading-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #303640;
+  border-radius: 8px;
+  color: #7896ee;
+  background: #15181d;
+}
+
+.ranking-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  margin-bottom: 14px;
+  border: 1px solid #292f37;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #111419;
+}
+
+.ranking-stats > div {
+  min-height: 105px;
+  padding: 18px 20px;
+  border-right: 1px solid #292f37;
+}
+
+.ranking-stats > div:last-child {
+  border-right: 0;
+}
+
+.ranking-stats span {
+  display: block;
+  margin-bottom: 12px;
+  color: #68717d;
+  font-size: 8px;
+}
+
+.ranking-stats strong {
+  color: #edf0f3;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.rankings-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.rankings-search {
+  flex: 1;
+  max-width: 480px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #2a3038;
+  border-radius: 6px;
+  background: #111419;
+  color: #626b77;
+  box-sizing: border-box;
+}
+
+.rankings-search:focus-within {
+  border-color: #526ba9;
+}
+
+.rankings-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #dfe2e6;
+  font-size: 9px;
+}
+
+.rankings-search input::placeholder {
+  color: #555e69;
+}
+
+.ranking-switcher {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #292f37;
+  border-radius: 6px;
+  background: #111419;
+}
+
+.ranking-switcher button {
+  border: 0;
+  border-radius: 4px;
+  padding: 7px 12px;
+  background: transparent;
+  color: #68717d;
+  cursor: pointer;
+  font-size: 8px;
+  transition:
+    background 120ms ease,
+    color 120ms ease;
+}
+
+.ranking-switcher button:hover {
+  color: #d7dbe0;
+}
+
+.ranking-switcher
+  .ranking-switch-active {
+  background: #222938;
+  color: #dfe4ee;
+}
+
+.rankings-panel {
+  overflow: hidden;
+  border: 1px solid #292f37;
+  border-radius: 8px;
+  background: #111419;
+}
+
+.rankings-table-head,
+.ranking-row {
+  display: grid;
+  grid-template-columns:
+    55px
+    minmax(220px, 1.8fr)
+    minmax(120px, 1fr)
+    minmax(105px, 0.8fr)
+    minmax(95px, 0.7fr)
+    minmax(80px, 0.65fr)
+    minmax(90px, 0.7fr)
+    42px;
+  align-items: center;
+  column-gap: 8px;
+}
+
+.rankings-table-head {
+  min-height: 40px;
+  border-bottom: 1px solid #292f37;
+  color: #5f6874;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.rankings-table-head span {
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.ranking-row {
+  min-height: 67px;
+  border-bottom: 1px solid #20252c;
+  transition: background 100ms ease;
+}
+
+.ranking-row:last-child {
+  border-bottom: 0;
+}
+
+.ranking-row:hover {
+  background: #15191e;
+}
+
+.ranking-position {
+  padding-left: 18px;
+  color: #555e69;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 8px;
+}
+
+.ranking-company {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ranking-company strong {
+  overflow: hidden;
+  color: #dfe3e7;
+  font-size: 10px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-company span {
+  color: #59626e;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 7px;
+}
+
+.ranking-industry {
+  overflow: hidden;
+  padding: 0 10px;
+  color: #747d88;
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ranking-value {
+  padding: 0 10px;
+  color: #b9c0c9;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.ranking-positive {
+  color: #58b990;
+}
+
+.ranking-growth {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 10px;
+  color: #58b990;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.ranking-open {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  color: #626b77;
+  text-decoration: none;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease,
+    background 120ms ease;
+}
+
+.ranking-open:hover {
+  border-color: #303640;
+  background: #1a1f26;
+  color: #dfe4ea;
+}
+
+.rankings-empty {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  color: #626b77;
+  font-size: 10px;
+}
+
+.rankings-error {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+  padding: 13px 15px;
+  border: 1px solid #493135;
+  border-radius: 6px;
+  background: #1b1416;
+}
+
+.rankings-error strong {
+  color: #e4b6b6;
+  font-size: 9px;
+}
+
+.rankings-error span {
+  color: #9b7378;
+  font-size: 8px;
+}
+
+@media (max-width: 1050px) {
+  .rankings-page {
+    padding: 24px;
+  }
+
+  .ranking-stats {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .ranking-stats > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .ranking-stats > div:nth-child(-n + 2) {
+    border-bottom: 1px solid #292f37;
+  }
+
+  .rankings-panel {
+    overflow-x: auto;
+  }
+
+  .rankings-table-head,
+  .ranking-row {
+    min-width: 900px;
+  }
+}
+
+@media (max-width: 700px) {
+  .rankings-page {
+    padding: 20px 16px 32px;
+  }
+
+  .rankings-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rankings-search {
+    max-width: none;
+  }
+
+  .ranking-switcher {
+    width: fit-content;
+  }
+
+  .rankings-heading h1 {
+    font-size: 23px;
+  }
+}

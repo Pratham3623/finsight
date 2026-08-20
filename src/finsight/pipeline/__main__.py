@@ -1,32 +1,31 @@
-from pathlib import Path
-
-from finsight.pipeline.local_etl import run_local_etl
+from finsight.config.settings import get_pipeline_settings
+from finsight.pipeline.orchestrator import (
+    PipelineConfig,
+    PipelineOrchestrator,
+)
 
 
 def main() -> None:
-    source_path = Path(
-        "data/raw/financial/financials_dirty.csv"
-    )
+    settings = get_pipeline_settings()
 
-    processed_path = Path(
-        "data/processed/financials.csv"
-    )
-
-    rejected_path = Path(
-        "data/rejected/financials.csv"
+    config = PipelineConfig(
+        source_path=settings.source_path,
+        processed_path=settings.processed_path,
+        rejected_path=settings.rejected_path,
     )
 
     print("FinSight Local ETL Pipeline")
     print("=" * 40)
 
-    result = run_local_etl(
-        source_path=source_path,
-        processed_path=processed_path,
-        rejected_path=rejected_path,
-    )
+    result = PipelineOrchestrator(config).run()
 
     report = result.quality_report
+    run = result.run
 
+    print(f"Run ID:           {run.run_id}")
+    print(f"Pipeline:         {run.pipeline_name}")
+    print(f"Status:           {run.status.value}")
+    print()
     print(f"Records extracted: {report.records_extracted:,}")
     print(f"Records processed: {report.records_valid:,}")
     print(f"Records rejected:  {report.records_rejected:,}")

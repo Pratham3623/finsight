@@ -30,24 +30,51 @@ def valid_dataframe() -> pd.DataFrame:
             "company_id": pd.Series([1], dtype="int64"),
             "fiscal_year": pd.Series([2021], dtype="int64"),
             "fiscal_quarter": pd.Series([1], dtype="int64"),
-            "period_end_date": pd.Series(["2021-03-31"], dtype="object"),
+            "period_end_date": pd.Series(
+                ["2021-03-31"],
+                dtype="object",
+            ),
             "revenue": pd.Series([100.0], dtype="float64"),
-            "operating_expenses": pd.Series([70.0], dtype="float64"),
-            "net_income": pd.Series([20.0], dtype="float64"),
-            "total_assets": pd.Series([200.0], dtype="float64"),
-            "total_liabilities": pd.Series([100.0], dtype="float64"),
-            "total_debt": pd.Series([50.0], dtype="float64"),
-            "operating_cash_flow": pd.Series([25.0], dtype="float64"),
-            "investing_cash_flow": pd.Series([-10.0], dtype="float64"),
-            "financing_cash_flow": pd.Series([5.0], dtype="float64"),
+            "operating_expenses": pd.Series(
+                [70.0],
+                dtype="float64",
+            ),
+            "net_income": pd.Series(
+                [20.0],
+                dtype="float64",
+            ),
+            "total_assets": pd.Series(
+                [200.0],
+                dtype="float64",
+            ),
+            "total_liabilities": pd.Series(
+                [100.0],
+                dtype="float64",
+            ),
+            "total_debt": pd.Series(
+                [50.0],
+                dtype="float64",
+            ),
+            "operating_cash_flow": pd.Series(
+                [25.0],
+                dtype="float64",
+            ),
+            "investing_cash_flow": pd.Series(
+                [-10.0],
+                dtype="float64",
+            ),
+            "financing_cash_flow": pd.Series(
+                [5.0],
+                dtype="float64",
+            ),
         }
     )
 
 
 def test_valid_financial_schema():
-    dataframe = valid_dataframe()
-
-    result = validate_financial_schema(dataframe)
+    result = validate_financial_schema(
+        valid_dataframe()
+    )
 
     assert result.is_valid
     assert result.missing_columns == []
@@ -56,12 +83,33 @@ def test_valid_financial_schema():
 
 
 def test_missing_column_is_detected():
-    dataframe = valid_dataframe().drop(columns=["revenue"])
+    dataframe = valid_dataframe().drop(
+        columns=["revenue"]
+    )
 
     result = validate_financial_schema(dataframe)
 
     assert not result.is_valid
     assert result.missing_columns == ["revenue"]
+
+
+def test_multiple_missing_columns_are_detected():
+    dataframe = valid_dataframe().drop(
+        columns=[
+            "revenue",
+            "net_income",
+            "total_assets",
+        ]
+    )
+
+    result = validate_financial_schema(dataframe)
+
+    assert not result.is_valid
+    assert result.missing_columns == [
+        "revenue",
+        "net_income",
+        "total_assets",
+    ]
 
 
 def test_unexpected_column_is_detected():
@@ -71,12 +119,32 @@ def test_unexpected_column_is_detected():
     result = validate_financial_schema(dataframe)
 
     assert not result.is_valid
-    assert result.unexpected_columns == ["unexpected_column"]
+    assert result.unexpected_columns == [
+        "unexpected_column"
+    ]
+
+
+def test_multiple_unexpected_columns_are_detected():
+    dataframe = valid_dataframe()
+
+    dataframe["extra_one"] = 1
+    dataframe["extra_two"] = 2
+
+    result = validate_financial_schema(dataframe)
+
+    assert not result.is_valid
+    assert result.unexpected_columns == [
+        "extra_one",
+        "extra_two",
+    ]
 
 
 def test_invalid_type_is_detected():
     dataframe = valid_dataframe()
-    dataframe["company_id"] = dataframe["company_id"].astype("string")
+
+    dataframe["company_id"] = (
+        dataframe["company_id"].astype("string")
+    )
 
     result = validate_financial_schema(dataframe)
 
@@ -84,5 +152,36 @@ def test_invalid_type_is_detected():
     assert "company_id" in result.invalid_types
 
 
+def test_multiple_invalid_types_are_detected():
+    dataframe = valid_dataframe()
+
+    dataframe["company_id"] = (
+        dataframe["company_id"].astype("string")
+    )
+
+    dataframe["revenue"] = (
+        dataframe["revenue"].astype("int64")
+    )
+
+    result = validate_financial_schema(dataframe)
+
+    assert not result.is_valid
+    assert "company_id" in result.invalid_types
+    assert "revenue" in result.invalid_types
+
+
+def test_missing_column_is_not_reported_as_invalid_type():
+    dataframe = valid_dataframe().drop(
+        columns=["revenue"]
+    )
+
+    result = validate_financial_schema(dataframe)
+
+    assert "revenue" in result.missing_columns
+    assert "revenue" not in result.invalid_types
+
+
 def test_expected_columns_are_defined():
-    assert list(valid_dataframe().columns) == EXPECTED_COLUMNS
+    assert list(valid_dataframe().columns) == (
+        EXPECTED_COLUMNS
+    )

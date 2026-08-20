@@ -47,3 +47,10 @@ build/
 data/raw/
 data/processed/
 data/rejected/
+finsight_project_context.txt
+create_context.sh
+
+# Local ETL outputs / runtime state
+data/processed/
+data/rejected/
+data/monitoring/

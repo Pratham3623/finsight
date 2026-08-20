@@ -1,0 +1,373 @@
+.industries-page {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 30px 34px 48px;
+  box-sizing: border-box;
+  color: #e8eaed;
+}
+
+.industries-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.industries-eyebrow {
+  margin: 0 0 7px;
+  color: #7896ee;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+.industries-heading h1 {
+  margin: 0;
+  color: #f0f2f4;
+  font-size: 27px;
+  font-weight: 550;
+  letter-spacing: -0.035em;
+}
+
+.industries-heading p {
+  margin: 7px 0 0;
+  color: #6d7682;
+  font-size: 10px;
+}
+
+.industries-heading-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #303640;
+  border-radius: 8px;
+  color: #7896ee;
+  background: #15181d;
+}
+
+.industry-stats {
+  display: grid;
+  grid-template-columns:
+    repeat(4, minmax(0, 1fr));
+  margin-bottom: 14px;
+  overflow: hidden;
+  border: 1px solid #292f37;
+  border-radius: 8px;
+  background: #111419;
+}
+
+.industry-stats > div {
+  min-height: 105px;
+  padding: 18px 20px;
+  border-right: 1px solid #292f37;
+}
+
+.industry-stats > div:last-child {
+  border-right: 0;
+}
+
+.industry-stats span {
+  display: block;
+  margin-bottom: 11px;
+  color: #68717d;
+  font-size: 8px;
+}
+
+.industry-stats strong {
+  display: block;
+  color: #edf0f3;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.industry-stats small {
+  display: block;
+  margin-top: 5px;
+  color: #59626e;
+  font-size: 7px;
+}
+
+.industries-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.industries-search {
+  flex: 1;
+  max-width: 480px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid #2a3038;
+  border-radius: 6px;
+  background: #111419;
+  color: #626b77;
+  box-sizing: border-box;
+}
+
+.industries-search:focus-within {
+  border-color: #526ba9;
+}
+
+.industries-search input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #dfe2e6;
+  font-size: 9px;
+}
+
+.industries-search input::placeholder {
+  color: #555e69;
+}
+
+.industry-sort {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid #292f37;
+  border-radius: 6px;
+  background: #111419;
+}
+
+.industry-sort button {
+  border: 0;
+  border-radius: 4px;
+  padding: 7px 11px;
+  background: transparent;
+  color: #68717d;
+  cursor: pointer;
+  font-size: 8px;
+}
+
+.industry-sort button:hover {
+  color: #d7dbe0;
+}
+
+.industry-sort
+  .industry-sort-active {
+  background: #222938;
+  color: #dfe4ee;
+}
+
+.industries-panel {
+  overflow: hidden;
+  border: 1px solid #292f37;
+  border-radius: 8px;
+  background: #111419;
+}
+
+.industries-table-head,
+.industry-row {
+  display: grid;
+  grid-template-columns:
+    48px
+    minmax(180px, 1.45fr)
+    80px
+    minmax(110px, 0.9fr)
+    minmax(95px, 0.8fr)
+    minmax(115px, 0.9fr)
+    75px
+    100px
+    100px
+    42px;
+  align-items: center;
+  column-gap: 6px;
+}
+
+.industries-table-head {
+  min-height: 40px;
+  border-bottom: 1px solid #292f37;
+  color: #5f6874;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 7px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.industries-table-head span {
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.industry-row {
+  min-height: 67px;
+  border-bottom: 1px solid #20252c;
+}
+
+.industry-row:last-child {
+  border-bottom: 0;
+}
+
+.industry-row:hover {
+  background: #15191e;
+}
+
+.industry-rank {
+  padding-left: 17px;
+  color: #555e69;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 8px;
+}
+
+.industry-name {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 0 8px;
+}
+
+.industry-name strong {
+  overflow: hidden;
+  color: #dfe3e7;
+  font-size: 10px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.industry-name span {
+  color: #59626e;
+  font-size: 7px;
+}
+
+.industry-number {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 8px;
+  color: #b9c0c9;
+  font-family:
+    "IBM Plex Mono",
+    "SFMono-Regular",
+    Consolas,
+    monospace;
+  font-size: 8px;
+  white-space: nowrap;
+}
+
+.industry-positive {
+  color: #58b990;
+}
+
+.industry-open {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: #626b77;
+  cursor: pointer;
+}
+
+.industry-open:hover {
+  border-color: #303640;
+  background: #1a1f26;
+  color: #dfe4ea;
+}
+
+.industries-empty {
+  min-height: 260px;
+  display: grid;
+  place-items: center;
+  color: #626b77;
+  font-size: 10px;
+}
+
+.industries-error {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+  padding: 13px 15px;
+  border: 1px solid #493135;
+  border-radius: 6px;
+  background: #1b1416;
+}
+
+.industries-error strong {
+  color: #e4b6b6;
+  font-size: 9px;
+}
+
+.industries-error span {
+  color: #9b7378;
+  font-size: 8px;
+}
+
+@media (max-width: 1100px) {
+  .industries-page {
+    padding: 24px;
+  }
+
+  .industry-stats {
+    grid-template-columns:
+      repeat(2, 1fr);
+  }
+
+  .industry-stats > div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .industry-stats > div:nth-child(-n + 2) {
+    border-bottom: 1px solid #292f37;
+  }
+
+  .industries-panel {
+    overflow-x: auto;
+  }
+
+  .industries-table-head,
+  .industry-row {
+    min-width: 1050px;
+  }
+}
+
+@media (max-width: 700px) {
+  .industries-page {
+    padding: 20px 16px 32px;
+  }
+
+  .industries-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .industries-search {
+    max-width: none;
+  }
+
+  .industry-sort {
+    width: fit-content;
+  }
+
+  .industries-heading h1 {
+    font-size: 23px;
+  }
+}

@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import json
 import os
 from typing import Any
@@ -8,97 +6,60 @@ import requests
 
 
 SYSTEM_PROMPT = """
-You are FinSight AI, a financial analytics assistant.
+You are FinSight Analyst, a financial analysis assistant inside
+the FinSight financial intelligence platform.
 
-Your job is to explain financial information calculated by
-the FinSight analytics platform.
+Your job is to interpret ONLY the financial data supplied by
+FinSight and answer the user's question accurately.
 
-CRITICAL GROUNDING RULES:
+CORE RULES:
 
-1. ONLY use information contained in the supplied FinSight data.
-2. NEVER invent, estimate, assume, or hallucinate financial figures.
-3. The deterministic_analysis section is authoritative.
-4. Any metric_leaders section is authoritative.
-5. Any overall_ranking section is authoritative.
-6. Any strongest_company section is authoritative.
-7. Never recalculate a metric when FinSight has already calculated it.
-8. Never replace a deterministic FinSight result with your own calculation.
-9. If information is missing or null, say that it is unavailable.
-10. If the supplied data cannot answer the exact question, say so directly.
-11. Do not answer a different or merely related question just because
-    the supplied data happens to contain information about it.
+1. Use only the supplied FinSight financial context.
+2. Never invent financial data.
+3. Never introduce external financial information.
+4. If a required value is missing, say it is unavailable.
+5. Deterministic FinSight calculations are authoritative.
+6. Do not independently recalculate deterministic comparison
+   or trend results.
+7. Clearly distinguish facts from interpretation.
 
-FINANCIAL TERMINOLOGY:
+COMPARISONS:
 
-12. "absolute_change" is the raw numerical/currency difference
-    between the first and latest value.
-
-13. "percentage_change" is the percentage change between the first
-    and latest value.
-
-14. "change_percentage_points" is the difference between two
-    percentage-based metrics expressed in percentage points.
-
-15. Never call a percentage change an absolute change.
-16. Never call a percentage-point change a percentage change.
-17. Preserve the terminology used by FinSight.
-
-TREND RULES:
-
-18. When discussing a trend, use the deterministic trend values
-    supplied by FinSight.
-
-19. Do not independently calculate CAGR, percentage changes,
-    percentage-point changes, rankings, or scores.
-
-20. If FinSight provides first_value, latest_value, and a calculated
-    change, use those supplied values.
-
-COMPARISON RULES:
-
-21. For company comparisons, use the supplied company-level
-    comparison data.
-
-22. metric_leaders contains deterministic winners for individual
-    metrics. Treat those results as authoritative.
-
-23. overall_ranking contains the deterministic relative ranking.
-    Treat it as authoritative.
-
-24. strongest_company contains the deterministic overall leader.
-    Treat it as authoritative.
-
-25. NEVER search historical periods yourself to determine which
-    company has the highest metric when metric_leaders already
-    provides that answer.
-
-26. NEVER substitute a historical quarter for a company-level
+8. Use the "companies" section for company-level facts.
+9. Use "metric_leaders" for metric-specific winners.
+10. Use "overall_ranking" for relative overall ranking.
+11. Use "strongest_company" for the deterministic overall leader.
+12. Never substitute a historical period for a company-level
     comparison.
+13. Do not independently determine a comparison winner when
+    deterministic comparison fields already provide the answer.
 
-27. Clearly distinguish:
-    - metric leader
-    - trend
-    - deterministic classification
-    - overall relative ranking
-    - your interpretation
+TRENDS:
 
-28. The overall comparison score is a relative FinSight comparison
-    aid, NOT an investment recommendation.
+14. Use "deterministic_analysis".
+15. Use the supplied trend values.
+16. Do not independently recalculate deterministic trend values.
+
+CHANGES:
+
+17. absolute_change means the raw numerical difference.
+18. percentage_change means percentage change.
+19. change_percentage_points means percentage-point difference.
+20. Keep these concepts strictly separate.
 
 FINANCIAL SAFETY:
 
-29. Do not provide investment advice.
-30. Do not tell the user to buy, sell, or hold securities.
-31. Do not introduce external financial information.
-32. Do not claim facts that are absent from the supplied context.
+21. Do not provide investment advice.
+22. Do not tell the user to buy, sell, or hold securities.
+23. Do not claim facts absent from the supplied context.
 
 RESPONSE STYLE:
 
-33. Directly answer the user's exact question.
-34. Use concise, professional financial language.
-35. Use headings and bullet points when they improve readability.
-36. Avoid unnecessary disclaimers.
-37. Clearly distinguish factual FinSight results from interpretation.
+24. Directly answer the user's exact question.
+25. Use concise, professional financial language.
+26. Use headings and bullet points when useful.
+27. Avoid unnecessary disclaimers.
+28. Clearly distinguish factual FinSight results from interpretation.
 """
 
 
@@ -110,6 +71,7 @@ class FinSightAnalyst:
         model: str | None = None,
         base_url: str | None = None,
     ) -> None:
+
         self.model = model or os.getenv(
             "OLLAMA_MODEL",
             "llama3:latest",
@@ -172,8 +134,8 @@ If this is a company comparison:
 3. Use "overall_ranking" for the relative overall ranking.
 4. Use "strongest_company" for the deterministic overall leader.
 5. Do NOT inspect historical periods to independently determine
-   a winner when the deterministic comparison fields already
-   provide the answer.
+   a winner when deterministic comparison fields already provide
+   the answer.
 
 If this is a trend question:
 
@@ -211,51 +173,178 @@ Give a concise, professional answer.
                 "repeat_penalty": 1.1,
                 "seed": 42,
                 "num_ctx": 8192,
+                "num_predict": 500,
             },
         }
 
+        session = requests.Session()
+
+        # Never use system proxy variables for the local Ollama
+        # connection.
+        session.trust_env = False
+
+        ollama_url = (
+            f"{self.base_url}/api/generate"
+        )
+
+        print(
+            "========== FINSIGHT OLLAMA REQUEST =========="
+        )
+        print(
+            f"PID: {os.getpid()}"
+        )
+        print(
+            f"MODEL: {self.model}"
+        )
+        print(
+            f"BASE URL: {self.base_url}"
+        )
+        print(
+            f"OLLAMA URL: {ollama_url}"
+        )
+        print(
+            f"CONTEXT LENGTH: {len(context)}"
+        )
+        print(
+            f"PROMPT LENGTH: "
+            f"{len(SYSTEM_PROMPT) + len(user_prompt)}"
+        )
+        print(
+            f"TRUST ENV: {session.trust_env}"
+        )
+        print(
+            "=============================================="
+        )
+
         try:
-            response = requests.post(
-                f"{self.base_url}/api/generate",
+            response = session.post(
+                ollama_url,
                 json=payload,
-                timeout=120,
+                timeout=(10, 300),
             )
+
         except requests.exceptions.ConnectionError as exc:
+
+            print(
+                "========== OLLAMA CONNECTION ERROR =========="
+            )
+            print(
+                f"TYPE: {type(exc).__name__}"
+            )
+            print(
+                f"ERROR: {exc}"
+            )
+            print(
+                f"ARGS: {exc.args}"
+            )
+
+            if exc.__cause__:
+                print(
+                    f"CAUSE: {repr(exc.__cause__)}"
+                )
+
+            if exc.__context__:
+                print(
+                    f"CONTEXT: {repr(exc.__context__)}"
+                )
+
+            print(
+                "=============================================="
+            )
+
             raise RuntimeError(
-                f"Could not reach Ollama at {self.base_url}. "
-                "Confirm that Ollama is running and reachable "
-                "from the API container."
+                "Could not reach Ollama at "
+                f"{self.base_url}. "
+                f"Underlying connection error: {exc!r}"
             ) from exc
 
         except requests.exceptions.Timeout as exc:
+
+            print(
+                "========== OLLAMA TIMEOUT ERROR ============="
+            )
+            print(
+                f"TYPE: {type(exc).__name__}"
+            )
+            print(
+                f"ERROR: {exc}"
+            )
+            print(
+                "=============================================="
+            )
+
             raise RuntimeError(
-                f"Ollama request to model '{self.model}' "
-                "timed out after 120 seconds."
+                f"Ollama request to model "
+                f"'{self.model}' timed out after "
+                "300 seconds."
             ) from exc
 
         except requests.exceptions.RequestException as exc:
+
+            print(
+                "========== OLLAMA REQUEST ERROR ============"
+            )
+            print(
+                f"TYPE: {type(exc).__name__}"
+            )
+            print(
+                f"ERROR: {exc}"
+            )
+            print(
+                f"ARGS: {exc.args}"
+            )
+            print(
+                "=============================================="
+            )
+
             raise RuntimeError(
-                f"Ollama request failed: {exc}"
+                f"Ollama request failed: {exc!r}"
             ) from exc
+
+        print(
+            "========== OLLAMA RESPONSE ================="
+        )
+        print(
+            f"STATUS: {response.status_code}"
+        )
+        print(
+            f"RESPONSE LENGTH: {len(response.text)}"
+        )
+        print(
+            f"RESPONSE PREVIEW: {response.text[:1000]}"
+        )
+        print(
+            "=============================================="
+        )
 
         if response.status_code != 200:
             raise RuntimeError(
                 "Ollama request failed with HTTP "
-                f"{response.status_code}: {response.text}"
+                f"{response.status_code}: "
+                f"{response.text}"
             )
 
         try:
             data = response.json()
+
         except ValueError as exc:
+
             raise RuntimeError(
                 "Ollama returned an invalid JSON response."
             ) from exc
 
         answer = data.get("response")
 
-        if not isinstance(answer, str) or not answer.strip():
+        if not isinstance(answer, str):
+            raise RuntimeError(
+                "Ollama returned an invalid response."
+            )
+
+        answer = answer.strip()
+
+        if not answer:
             raise RuntimeError(
                 "Ollama returned an empty response."
             )
 
-        return answer.strip()
+        return answer

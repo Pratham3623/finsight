@@ -66,3 +66,121 @@ def test_invalid_ranking_limit():
     response = client.get("/api/companies/rankings?limit=0")
 
     assert response.status_code == 400
+def test_ai_analysis_rejects_zero_company_id():
+    response = client.post(
+        "/api/ai/analyze",
+        json={
+            "question": "What is the revenue?",
+            "company_id": 0,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_analysis_rejects_negative_company_id():
+    response = client.post(
+        "/api/ai/analyze",
+        json={
+            "question": "What is the revenue?",
+            "company_id": -1,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_analysis_rejects_empty_question():
+    response = client.post(
+        "/api/ai/analyze",
+        json={
+            "question": "   ",
+            "company_id": 1,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_analysis_rejects_question_over_max_length():
+    response = client.post(
+        "/api/ai/analyze",
+        json={
+            "question": "x" * 4001,
+            "company_id": 1,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_portfolio_rejects_invalid_limit():
+    response = client.post(
+        "/api/ai/portfolio",
+        json={
+            "question": "Analyze the portfolio.",
+            "limit": 0,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_portfolio_rejects_limit_above_maximum():
+    response = client.post(
+        "/api/ai/portfolio",
+        json={
+            "question": "Analyze the portfolio.",
+            "limit": 101,
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_comparison_rejects_negative_company_id():
+    response = client.post(
+        "/api/ai/compare",
+        json={
+            "question": "Compare these companies.",
+            "company_ids": [1, -2],
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_comparison_rejects_zero_company_id():
+    response = client.post(
+        "/api/ai/compare",
+        json={
+            "question": "Compare these companies.",
+            "company_ids": [1, 0],
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_comparison_rejects_duplicate_company_ids():
+    response = client.post(
+        "/api/ai/compare",
+        json={
+            "question": "Compare these companies.",
+            "company_ids": [1, 1],
+        },
+    )
+
+    assert response.status_code == 422
+
+
+def test_ai_comparison_rejects_too_many_company_ids():
+    response = client.post(
+        "/api/ai/compare",
+        json={
+            "question": "Compare these companies.",
+            "company_ids": list(range(1, 12)),
+        },
+    )
+
+    assert response.status_code == 422
